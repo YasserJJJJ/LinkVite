@@ -1,31 +1,61 @@
 "use client";
-import { useState } from "react";
+
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { register } from "@/lib/auth";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [age, setAge] = useState("");
-  const [sex, setSex] = useState("");
   const [gender, setGender] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    try {
+      setLoading(true);
+      const data = await register({
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        age: age ? Number(age) : null,
+        gender: gender || null,
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      localStorage.setItem("linkvite_token", data.access_token);
+      localStorage.setItem("linkvite_user", JSON.stringify(data.user));
+      setMessage("Account created successfully.");
+
+      setFirstName("");
+      setLastName("");
+      setAge("");
+      setGender("");
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_20px_40px_rgba(0,0,0,0.06)]">
-        {/* Header */}
-        <h1 className="text-2xl font-semibold text-slate-900">
-          Create an account!
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Create events in seconds
-        </p>
+        <h1 className="text-2xl font-semibold text-slate-900">Create an account!</h1>
+        <p className="mt-1 text-sm text-slate-500">Create events in seconds</p>
 
-        {/* Google OAuth Button */}
         <button
           type="button"
           className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 active:scale-[0.99]"
@@ -34,16 +64,13 @@ export default function SignUp() {
           Continue with Google
         </button>
 
-        {/* Divider */}
         <div className="my-6 flex items-center gap-4">
           <div className="h-px flex-1 bg-slate-200" />
           <span className="text-xs text-slate-400">OR</span>
           <div className="h-px flex-1 bg-slate-200" />
         </div>
 
-        {/* Form */}
-        <form className="space-y-4">
-          {/* First + Last name */}
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex gap-3">
             <input
               type="text"
@@ -51,6 +78,7 @@ export default function SignUp() {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="w-1/2 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+              required
             />
             <input
               type="text"
@@ -58,10 +86,10 @@ export default function SignUp() {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               className="w-1/2 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+              required
             />
           </div>
 
-          {/* Age + Sex */}
           <div className="flex gap-3">
             <input
               type="text"
@@ -73,22 +101,20 @@ export default function SignUp() {
               className="w-1/2 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
             />
 
-            <label htmlFor="sex" className="sr-only">Select Sex</label>
             <select
-              aria-label="Select Gender"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+              aria-label="Select gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
             >
-            <option value="">Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-            <option value="prefer_not_to_say">Prefer not to say</option>
+              <option value="">Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer_not_to_say">Prefer not to say</option>
             </select>
           </div>
 
-          {/* Email */}
           <input
             type="email"
             placeholder="Email"
@@ -98,7 +124,6 @@ export default function SignUp() {
             required
           />
 
-          {/* Password */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -107,6 +132,7 @@ export default function SignUp() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
               required
+              minLength={8}
             />
             <button
               type="button"
@@ -117,23 +143,21 @@ export default function SignUp() {
             </button>
           </div>
 
-          {/* CTA */}
+          {error ? <p className="text-sm text-red-500">{error}</p> : null}
+          {message ? <p className="text-sm text-green-600">{message}</p> : null}
+
           <button
             type="submit"
-            className="w-full rounded-xl py-3 text-sm font-semibold text-white
-                       bg-gradient-to-r from-sky-500 via-blue-500 to-fuchsia-500
-                       shadow-[0_10px_20px_rgba(59,130,246,0.25)]
-                       transition hover:from-sky-600 hover:via-blue-600 hover:to-fuchsia-600
-                       active:scale-[0.99]"
+            disabled={loading}
+            className="w-full rounded-xl py-3 text-sm font-semibold text-white bg-gradient-to-r from-sky-500 via-blue-500 to-fuchsia-500 shadow-[0_10px_20px_rgba(59,130,246,0.25)] transition hover:from-sky-600 hover:via-blue-600 hover:to-fuchsia-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            Log in
+            {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
 
-        {/* Footer */}
         <p className="mt-6 text-center text-xs text-slate-500">
           Already have an account?{" "}
-          <Link className="text-slate-800 hover:underline cursor-pointer" href={"/signin"}>
+          <Link className="text-slate-800 hover:underline cursor-pointer" href="/signin">
             Login
           </Link>
         </p>
@@ -152,4 +176,3 @@ function GoogleG({ className = "" }: { className?: string }) {
     </svg>
   );
 }
-

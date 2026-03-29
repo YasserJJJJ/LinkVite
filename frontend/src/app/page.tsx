@@ -41,7 +41,7 @@ export default function Home() {
 
           <Link href="/signup">
             <Button className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition">
-              Try it for free
+              Start for free
             </Button>
           </Link>
 
@@ -56,7 +56,7 @@ export default function Home() {
         width="760"
         height="760"
         />
-        <h2 className="text-2xl text-gray-500 text-center">
+        <h2 className="text-2xl font-bold text-center">
           Your Ultimate Event Management Solution
         </h2>
     </div>
