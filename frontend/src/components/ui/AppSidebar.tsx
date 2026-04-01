@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 
 import {
@@ -48,7 +49,7 @@ const items = [
   },
   {
     title: "Calendar",
-    url: "#",
+    url: "/calendar",
     icon: Calendar,
   },
   {
@@ -101,9 +102,8 @@ export default function AppSidebar() {
         <SidebarGroupLabel> Events </SidebarGroupLabel>
 
         <SidebarGroupAction>
-          <Plus>
+          <Plus/>
             <span className="sr-only"> Create an Event </span>
-          </Plus>
         </SidebarGroupAction>
       </SidebarGroup>
       <SidebarGroupContent>
