@@ -111,7 +111,7 @@ export default function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="#">
+                <Link href="/create-an-event">
                   <BadgePlus />
                   <span> Create New Event </span>
                 </Link>
@@ -119,7 +119,7 @@ export default function AppSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="#">
+                <Link href="/view-all-events">
                   <Badge />
                   <span> View all My Events </span>
                 </Link>

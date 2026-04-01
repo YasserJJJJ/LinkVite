@@ -67,3 +67,59 @@ export async function getCurrentUser(token: string): Promise<AuthUser> {
 
   return handleResponse(response);
 }
+
+export type EventPayload = {
+  title: string;
+  description?: string | null;
+  cover_image?: string | null;
+  start_datetime: string;
+  location_type: "online" | "physical";
+  location_details?: string | null;
+  capacity?: number | null;
+  is_paid: boolean;
+  organizer_name: string;
+  organizer_email: string;
+  status: "draft" | "published";
+};
+
+export type EventItem = {
+  id: number;
+  title: string;
+  description: string | null;
+  cover_image: string | null;
+  start_datetime: string;
+  location_type: "online" | "physical";
+  location_details: string | null;
+  capacity: number | null;
+  is_paid: boolean;
+  organizer_name: string;
+  organizer_email: string;
+  status: "draft" | "published";
+  owner_id: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function createEvent(token: string, payload: EventPayload): Promise<EventItem> {
+  const response = await fetch(`${API_BASE_URL}/api/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return handleResponse(response);
+}
+
+export async function getMyEvents(token: string): Promise<{ items: EventItem[] }> {
+  const response = await fetch(`${API_BASE_URL}/api/events/mine`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return handleResponse(response);
+}
